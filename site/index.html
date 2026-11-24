@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#03060c">
+<title>교수님 연구실 안내 · 단국대학교 천안</title>
+<meta name="description" content="단국대학교 천안캠퍼스 교수님의 연구실 위치와 현재 시간표상 수업 여부를 확인하세요.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="data.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="site-head"><div class="site-head-inner">
+<p class="campus"><b>단국대학교</b><span class="campus-divider" aria-hidden="true"></span><span>천안캠퍼스</span></p>
+</div></header>
+
+<section class="hero" aria-label="현재 기준 시간과 검색"><div class="hero-inner">
+<div class="current-time">
+<p class="time-label">현재 기준</p>
+<p class="now-time"><span id="hh">--</span><span class="colon">:</span><span id="mm">--</span></p>
+<p class="now-date" id="now-date">시간 확인 중</p>
+</div>
+<label class="search">
+<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 4.2 4.2" stroke-linecap="round"/></svg>
+<span class="sr-only">교수님 이름, 학과 또는 연구실 검색</span><input id="search" type="search" placeholder="이름, 학과, 연구실 검색" autocomplete="off">
+</label>
+</div></section>
+
+<main class="directory" aria-label="교수님 연구실"><div class="wrap">
+<section class="directory-panel" aria-label="교수님 목록">
+<p class="mobile-note"><span>교수님 · 연구실 위치</span><span>등록 시간표 기준</span></p>
+<table class="directory-table" aria-label="교수님 연구실과 현재 수업 여부">
+<thead><tr><th scope="col" class="professor-column">교수님</th><th scope="col" class="location-column">연구실 위치</th><th scope="col" class="status-column">수업 여부<small>시간표 기준</small></th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+<div class="empty" id="empty" hidden><p>검색 결과가 없습니다.</p><span>이름, 학과 또는 연구실을 다시 확인해 주세요.</span><button type="button" id="reset">전체 교수님 보기</button></div></section>
+</div></main>
+
+<footer class="site-foot"><div class="foot-inner">
+<p class="visit-note">수업이 없어도 연구실에 계시지 않을 수 있습니다.</p>
+<p class="source"><span id="source-line">2026학년도 2학기 공개 자료 기반 · 최초 확인 2026.11.24</span><br>휴강·보강·진료 일정은 다를 수 있습니다. 교수님 이름을 누르면 공식 교원정보가 열립니다.</p>
+</div></footer>
+</body>
+</html>
