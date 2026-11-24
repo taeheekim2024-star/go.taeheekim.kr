@@ -445,18 +445,30 @@
         if (e.start >= e.end) return fail(e.title + ': 종료 시각이 시작보다 늦어야 합니다.');
         events.push(e);
       }
-      var key = localStorage.getItem(KEY_STORE) || keyInput.value.trim();
+      var storedKey = localStorage.getItem(KEY_STORE);
+      var key = storedKey || keyInput.value.trim();
       if (!key) return fail('관리자 키를 넣어 주세요.');
       var change = { building: building.value.trim(), room: room.value.trim(), events: sortEvents(events) };
+      var unchanged = change.building === person.building && change.room === person.room &&
+        JSON.stringify(change.events) === JSON.stringify(sortEvents(person.events));
+      if (unchanged && storedKey) {
+        shut();
+        return toast('바뀐 내용이 없습니다.');
+      }
       saving = true;
       save.disabled = true;
       save.textContent = '저장 중…';
-      saveToGitHub(person.id, person.name, change, key).then(function (latest) {
+      // 바뀐 것 없이 새 키만 넣은 경우: 저장소를 한 번 읽어 키가 맞는지만 확인하고 키를 기억한다.
+      var job = unchanged
+        ? github('GET', '/repos/' + REPO + '/contents/' + DATA_PATH + '?ref=main', key).then(function () { return null; })
+        : saveToGitHub(person.id, person.name, change, key);
+      job.then(function (latest) {
         localStorage.setItem(KEY_STORE, key);
-        D = latest;
-        window.FACULTY = latest;
         saving = false;
         shut();
+        if (!latest) return toast('관리자 키를 이 기기에 저장했습니다. 바뀐 내용은 없습니다.');
+        D = latest;
+        window.FACULTY = latest;
         buildRows();
         var row = rows.find(function (r) { return r.person.id === person.id; });
         if (row && row.toggle) row.toggle.focus();
