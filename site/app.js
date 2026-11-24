@@ -9,7 +9,7 @@
   var AUTHOR = { name: 'taeheekim2024-star', email: '295946926+taeheekim2024-star@users.noreply.github.com' };
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
-  var D = window.FACULTY;
+  var D = null; // data.js를 받은 뒤 채움(start 참고)
 
   /* ---------- 수업 여부 계산 ---------- */
   // kind: class(수업 중) · free(수업 없음) · unknown(시간표 미확인) · expired(학기 밖이라 갱신 필요)
@@ -532,10 +532,24 @@
     });
   }
 
-  document.getElementById('source-line').textContent = D.semester.label + ' 공개 자료 기반 · 최초 확인 ' + D.sourceDate.replace(/-/g, '.');
-  buildRows();
-  tick();
-  setInterval(tick, 15000);
-  window.addEventListener('focus', tick);
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+  function start() {
+    D = window.FACULTY;
+    document.getElementById('source-line').textContent = D.semester.label + ' 공개 자료 기반 · 최초 확인 ' + D.sourceDate.replace(/-/g, '.');
+    buildRows();
+    tick();
+    setInterval(tick, 15000);
+    window.addEventListener('focus', tick);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+  }
+
+  // 자료는 매번 새로 받는다(수정 저장 직후 새로고침해도 예전 자료가 캐시에서 나오지 않게).
+  var loader = document.createElement('script');
+  loader.src = 'data.js?t=' + Date.now();
+  loader.onload = start;
+  loader.onerror = function () {
+    empty.hidden = false;
+    empty.textContent = '';
+    empty.append(el('p', '', '자료를 불러오지 못했습니다.'), el('span', '', '잠시 후 새로고침해 주세요.'));
+  };
+  document.head.append(loader);
 })();
