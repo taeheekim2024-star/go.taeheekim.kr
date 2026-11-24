@@ -9,6 +9,11 @@ window.FACULTY = {
   "periodSource": "https://www.dankook.ac.kr/documents/20118/12232463/2026%ED%95%99%EB%85%84%EB%8F%84%201%ED%95%99%EA%B8%B0%20%EC%A2%85%ED%95%A9%EA%B0%95%EC%9D%98%EC%8B%9C%EA%B0%84%ED%91%9C_%EC%97%85%EB%A1%9C%EB%93%9C%EC%9A%A9260119.pdf/0ecd0cf2-f64b-5986-a0c2-d01235678d4b?version=13.0",
   "termSource": "https://bootcamp.dankook.ac.kr/education/courseList.php?list=list&year=2026",
   "professors": [
+    {"id": "kang-jason", "name": "강제이슨", "department": "생활체육학과", "building": "인문과학관", "room": "244", "uld": "FC644D0FECBADF0F24549694096A744C", "events": [
+      {"title":"스포츠영어회화1","day":2,"start":"13:00","end":"15:00","room":"산학112"},
+      {"title":"골프","day":3,"start":"13:00","end":"15:00","room":"인517-01"},
+      {"title":"골프","day":3,"start":"15:00","end":"17:00","room":"인517-01"}
+    ]},
     {"id": "kim-taeyoung", "name": "김태영", "department": "치의예과", "building": "치의학관·치과대학병원", "room": "207-03", "uld": "6FED6E1D6582CD4FBC40B494F5F55B3D", "events": [
       {"title":"치아형태학실험","day":2,"start":"15:00","end":"18:00","room":"치205-01"},
       {"title":"치과해부학실험","day":3,"start":"12:00","end":"15:00","room":"치B11"},

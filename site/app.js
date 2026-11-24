@@ -370,17 +370,13 @@
     keyInput.type = 'password';
     keyInput.autocomplete = 'off';
     keyInput.placeholder = 'github_pat_…';
+    // 키는 한 번 넣으면 이 기기에 저장되어 그다음부터는 칸 자체가 보이지 않는다(틀린 키면 다시 물음).
     function paintKey() {
       keyBox.textContent = '';
-      if (localStorage.getItem(KEY_STORE)) {
-        var forget = el('button', 'ed-forget', '이 기기에 저장된 관리자 키 지우기');
-        forget.type = 'button';
-        forget.addEventListener('click', function () { localStorage.removeItem(KEY_STORE); paintKey(); });
-        keyBox.append(forget);
-      } else {
-        keyBox.append(field('관리자 키 (GitHub)', keyInput));
-        keyBox.append(el('p', 'ed-hint', '처음 한 번만 넣으면 이 기기에 저장됩니다.'));
-      }
+      keyBox.hidden = !!localStorage.getItem(KEY_STORE);
+      if (keyBox.hidden) return;
+      keyBox.append(field('관리자 키 (GitHub)', keyInput));
+      keyBox.append(el('p', 'ed-hint', '처음 한 번만 넣으면 이 기기에 저장됩니다.'));
     }
     paintKey();
     body.append(keyBox);
