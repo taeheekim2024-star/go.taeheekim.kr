@@ -1,15 +1,17 @@
 /* 현재 시각(한국 시간)으로 교수님별 수업 여부를 계산해 표를 채운다.
-   이름을 누르면 그 교수님의 수업 시간이 아래로 펼쳐지고, '수정'으로 연구실·수업 시간을 고쳐
-   GitHub 저장소의 site/data.js에 바로 저장한다(관리자 키 필요, 저장 뒤 1~2분이면 사이트에 반영). */
+   이름을 누르면 그 교수님의 수업 시간이 아래로 펼쳐지고, '수정'으로 연구실·수업 시간을 고칠 수 있다.
+   저장은 누구나 할 수 있다: 저장 담당 Google Apps Script(apps-script/Code.gs)가 내용을 검사한 뒤
+   GitHub 저장소의 site/data.js에 커밋하고, 1~2분 뒤 사이트에 반영된다(키는 Apps Script 안에만 있음). */
 (function () {
   'use strict';
-  var REPO = 'taeheekim2024-star/go.taeheekim.kr';
-  var DATA_PATH = 'site/data.js';
-  var KEY_STORE = 'go-site-github-key';
-  var AUTHOR = { name: 'taeheekim2024-star', email: '295946926+taeheekim2024-star@users.noreply.github.com' };
+  var SAVE_URL = 'https://script.google.com/macros/s/AKfycbzAu1eopgCFC0UlqjWzMLiZxXSylPyjEvsUjgCh26W2imjFvGS-29w_O-ZmOzA_O6HnDg/exec';
+  var OLD_KEY_STORE = 'go-site-github-key';
   var DAYS = ['일', '월', '화', '수', '목', '금', '토'];
   var DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
   var D = null; // data.js를 받은 뒤 채움(start 참고)
+
+  // 예전 방식(브라우저에 GitHub 키 저장)에서 남은 키는 이제 필요 없으므로 지운다.
+  try { localStorage.removeItem(OLD_KEY_STORE); } catch (e) { /* 저장소를 못 쓰는 브라우저 */ }
 
   /* ---------- 수업 여부 계산 ---------- */
   // kind: class(수업 중) · free(수업 없음) · unknown(시간표 미확인) · expired(학기 밖이라 갱신 필요)
@@ -46,47 +48,8 @@
     });
   }
 
-  /* ---------- data.js 읽고 쓰기(형식은 go_site_kit/migrate-data.mjs와 같아야 함) ---------- */
-  var HEADER = "/* 교수님 연구실·시간표 자료. 사이트에서 '수정'으로 저장하면 이 파일 전체가 다시 써진다.\n" +
-    "   'window.FACULTY = ' 뒤는 JSON 형식을 지킨다(큰따옴표, 주석·끝 쉼표 없음).\n" +
-    "   events: day 0=일 1=월 … 6=토, start·end는 한국 시간 'HH:MM', room은 강의실. */";
-  function serialize(d) {
-    var q = JSON.stringify;
-    var lines = [HEADER, 'window.FACULTY = {'];
-    Object.keys(d).forEach(function (key) {
-      if (key !== 'professors') lines.push('  ' + q(key) + ': ' + q(d[key]) + ',');
-    });
-    lines.push('  "professors": [');
-    d.professors.forEach(function (p, i) {
-      var head = Object.keys(p).filter(function (k) { return k !== 'events'; })
-        .map(function (k) { return q(k) + ': ' + q(p[k]); }).join(', ');
-      lines.push('    {' + head + ', "events": [');
-      p.events.forEach(function (e, j) { lines.push('      ' + q(e) + (j < p.events.length - 1 ? ',' : '')); });
-      lines.push('    ]}' + (i < d.professors.length - 1 ? ',' : ''));
-    });
-    lines.push('  ]', '};', '');
-    return lines.join('\n');
-  }
-  function parseData(text) {
-    var start = text.indexOf('{', text.indexOf('window.FACULTY'));
-    var end = text.lastIndexOf('}');
-    return JSON.parse(text.slice(start, end + 1));
-  }
-  function toBase64(text) {
-    var bytes = new TextEncoder().encode(text);
-    var binary = '';
-    for (var i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-    return btoa(binary);
-  }
-  function fromBase64(b64) {
-    var binary = atob(b64.replace(/\s/g, ''));
-    var bytes = new Uint8Array(binary.length);
-    for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    return new TextDecoder().decode(bytes);
-  }
-
   window.FacultyLogic = {
-    statusAt: statusAt, seoulNow: seoulNow, serialize: serialize, parseData: parseData,
+    statusAt: statusAt, seoulNow: seoulNow,
     get people() { return D.professors; },
   };
 
@@ -365,22 +328,6 @@
     });
     body.append(add);
 
-    var keyBox = el('div', 'ed-key');
-    var keyInput = el('input');
-    keyInput.type = 'password';
-    keyInput.autocomplete = 'off';
-    keyInput.placeholder = 'github_pat_…';
-    // 키는 한 번 넣으면 이 기기에 저장되어 그다음부터는 칸 자체가 보이지 않는다(틀린 키면 다시 물음).
-    function paintKey() {
-      keyBox.textContent = '';
-      keyBox.hidden = !!localStorage.getItem(KEY_STORE);
-      if (keyBox.hidden) return;
-      keyBox.append(field('관리자 키 (GitHub)', keyInput));
-      keyBox.append(el('p', 'ed-hint', '처음 한 번만 넣으면 이 기기에 저장됩니다.'));
-    }
-    paintKey();
-    body.append(keyBox);
-
     var foot = el('div', 'ed-foot');
     var error = el('p', 'ed-error');
     error.setAttribute('role', 'alert');
@@ -441,30 +388,21 @@
         if (e.start >= e.end) return fail(e.title + ': 종료 시각이 시작보다 늦어야 합니다.');
         events.push(e);
       }
-      var storedKey = localStorage.getItem(KEY_STORE);
-      var key = storedKey || keyInput.value.trim();
-      if (!key) return fail('관리자 키를 넣어 주세요.');
-      var change = { building: building.value.trim(), room: room.value.trim(), events: sortEvents(events) };
+      var change = { id: person.id, building: building.value.trim(), room: room.value.trim(), events: sortEvents(events) };
       var unchanged = change.building === person.building && change.room === person.room &&
         JSON.stringify(change.events) === JSON.stringify(sortEvents(person.events));
-      if (unchanged && storedKey) {
+      if (unchanged) {
         shut();
         return toast('바뀐 내용이 없습니다.');
       }
       saving = true;
       save.disabled = true;
       save.textContent = '저장 중…';
-      // 바뀐 것 없이 새 키만 넣은 경우: 저장소를 한 번 읽어 키가 맞는지만 확인하고 키를 기억한다.
-      var job = unchanged
-        ? github('GET', '/repos/' + REPO + '/contents/' + DATA_PATH + '?ref=main', key).then(function () { return null; })
-        : saveToGitHub(person.id, person.name, change, key);
-      job.then(function (latest) {
-        localStorage.setItem(KEY_STORE, key);
-        saving = false;
-        shut();
-        if (!latest) return toast('관리자 키를 이 기기에 저장했습니다. 바뀐 내용은 없습니다.');
+      sendChange(change).then(function (latest) {
         D = latest;
         window.FACULTY = latest;
+        saving = false;
+        shut();
         buildRows();
         var row = rows.find(function (r) { return r.person.id === person.id; });
         if (row && row.toggle) row.toggle.focus();
@@ -473,70 +411,28 @@
         saving = false;
         save.disabled = false;
         save.textContent = '저장';
-        if (err && err.status === 401) {
-          localStorage.removeItem(KEY_STORE);
-          paintKey();
-          return fail('관리자 키가 맞지 않습니다. 키를 다시 넣어 주세요.');
-        }
-        if (err && (err.status === 403 || err.status === 404)) return fail('이 키로는 저장할 수 없습니다. 키의 저장소 권한(Contents 쓰기)을 확인해 주세요.');
         fail(err && err.userMessage ? err.userMessage : '저장하지 못했습니다. 연결을 확인하고 다시 저장해 주세요.');
       });
     });
   }
 
-  function github(method, path, key, body) {
-    return fetch('https://api.github.com' + path, {
-      method: method,
-      cache: 'no-store',
-      headers: {
-        'Accept': 'application/vnd.github+json',
-        'Authorization': 'Bearer ' + key,
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/json',
-      },
-      body: body ? JSON.stringify(body) : undefined,
+  // 저장 담당 Apps Script로 보낸다. text/plain으로 보내 사전 확인(preflight) 없이 가고, 쿠키는 보내지 않는다.
+  function sendChange(change) {
+    return fetch(SAVE_URL, {
+      method: 'POST',
+      credentials: 'omit',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(change),
     }).then(function (response) {
-      return response.json().catch(function () { return {}; }).then(function (data) {
-        if (!response.ok) {
-          var err = new Error(data && data.message ? data.message : 'GitHub ' + response.status);
-          err.status = response.status;
-          throw err;
-        }
-        return data;
-      });
-    });
-  }
-
-  // 저장소의 최신 data.js를 받아 이 교수님 자료만 바꿔 다시 올린다(다른 기기에서 고친 내용 보존).
-  function saveToGitHub(id, name, change, key, retried) {
-    var path = '/repos/' + REPO + '/contents/' + DATA_PATH;
-    return github('GET', path + '?ref=main', key).then(function (file) {
-      var latest;
-      try { latest = parseData(fromBase64(file.content)); } catch (e) {
-        var err = new Error('parse');
-        err.userMessage = '저장소의 자료 파일 형식을 읽지 못했습니다.';
+      return response.json();
+    }).then(function (result) {
+      if (!result || !result.ok || !result.data) {
+        var err = new Error('save failed');
+        err.userMessage = result && result.error ? result.error : '저장하지 못했습니다. 잠시 뒤 다시 저장해 주세요.';
         throw err;
       }
-      var target = latest.professors.find(function (p) { return p.id === id; });
-      if (!target) {
-        var missing = new Error('missing');
-        missing.userMessage = '저장소 자료에서 이 교수님을 찾지 못했습니다.';
-        throw missing;
-      }
-      target.building = change.building;
-      target.room = change.room;
-      target.events = change.events;
-      return github('PUT', path, key, {
-        message: name + ' 교수님 정보 수정',
-        content: toBase64(serialize(latest)),
-        sha: file.sha,
-        branch: 'main',
-        author: AUTHOR,
-        committer: AUTHOR,
-      }).then(function () { return latest; });
-    }).catch(function (err) {
-      if (!retried && err && (err.status === 409 || err.status === 422)) return saveToGitHub(id, name, change, key, true);
-      throw err;
+      return result.data;
     });
   }
 

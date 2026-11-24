@@ -17,9 +17,11 @@
 
 ## 자료 고치기
 
-사이트에서: 이름을 눌러 펼친 뒤 **수정** → 건물·호실·수업(수업명, 요일, 시작, 종료, 강의실)을 고치고 **저장**. 저장하면 이 저장소의 `site/data.js`가 커밋되고 1~2분 뒤 사이트에 반영된다. 저장에는 관리자 키가 필요하다(처음 한 번 넣으면 그 기기 브라우저에만 저장).
+사이트에서 **누구나** 고칠 수 있다: 이름을 눌러 펼친 뒤 **수정** → 건물·호실·수업(수업명, 요일, 시작, 종료, 강의실)을 고치고 **저장**. 키는 필요 없다. 1~2분 뒤 사이트에 반영된다.
 
-관리자 키 만들기: GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token. Repository access는 *Only select repositories*에서 `go.taeheekim.kr`만, Permissions의 Repository permissions에서 *Contents*를 *Read and write*로 두고 만든 뒤, 나온 키(`github_pat_…`)를 수정 창의 '관리자 키'에 붙여 넣는다. 키가 만료되면 수정 창이 다시 키를 묻는다.
+저장 경로: 사이트 → 저장 담당 Google Apps Script 웹 앱(`apps-script/Code.gs`, 프로젝트 'go.taeheekim.kr 저장', 실행 계정 = 소유자, 액세스 = 모든 사용자) → GitHub contents API로 `site/data.js` 커밋('<이름> 교수님 정보 수정 (사이트)'). Apps Script가 형식과 길이를 검사하고(기존 교수님의 건물·호실·수업만, 수업 60개, 시각 HH:MM, 10분에 30번까지), GitHub 키는 Apps Script 스크립트 속성 `GITHUB_TOKEN`에만 있다. 장난 수정은 커밋 이력으로 되돌린다.
+
+키 바꾸기: GitHub → Settings → Developer settings → Fine-grained tokens의 'go.taeheekim.kr 수정'(이 저장소만, Contents 읽기·쓰기, 2027-11-24 만료)을 Regenerate → 새 키를 Apps Script 프로젝트 설정 > 스크립트 속성 `GITHUB_TOKEN`에 붙여 넣고 저장. 배포 주소는 그대로다. 저장 담당 상태는 웹 앱 주소를 그냥 열면(`{"ok":true,"read":200}`) 확인된다. `apps-script/Code.gs`를 고치면 편집기에 붙여 넣고 배포 관리에서 새 버전으로 배포한다.
 
 파일로 직접 고칠 때는 `site/data.js`의 `window.FACULTY = ` 뒤를 JSON 형식(큰따옴표, 주석·끝 쉼표 없음)으로 유지한다. 사이트 저장이 이 형식으로 파일 전체를 다시 쓴다. 학기 기간·휴일·최초 확인일도 이 파일에 있다. 화면 문구는 늘리지 않는다(사이트 제목이나 소개 문장 없음).
 
