@@ -60,7 +60,7 @@ window.FACULTY = {
       {"title":"미생물화학2","day":4,"start":"09:30","end":"11:00","room":"자연1관509"},
       {"title":"환경미생물학","day":4,"start":"14:30","end":"16:00","room":"자연1관514"}
     ]},
-    {"id": "lee-sak", "name": "이삭", "department": "의예과", "building": "", "room": "", "uld": "C87AE0D2A371BC10C6EFE16EF9AC1E06", "events": [
+    {"id": "lee-sak", "name": "이삭", "department": "의예과", "building": "의학관", "room": "343호", "uld": "C87AE0D2A371BC10C6EFE16EF9AC1E06", "events": [
     ]},
     {"id": "jung-sooyong", "name": "정수용", "department": "해병대군사학과", "building": "사회과학관", "room": "108", "uld": "B71BB8895AEBA897B1B31FD72CE772E0", "events": [
       {"title":"군사심리학","day":1,"start":"09:30","end":"12:30","room":"사회302"},
