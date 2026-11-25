@@ -77,7 +77,8 @@ window.FACULTY = {
     {"id": "hong-jihye", "name": "홍지혜", "department": "의예과", "building": "의학관", "room": "248", "uld": "FC374FBF9B7C48CDA04426B223AC25CC", "events": [
       {"title":"생화학2","day":1,"start":"10:00","end":"11:30","room":""},
       {"title":"생체분자의 이해","day":2,"start":"10:30","end":"12:30","room":"의학관2"},
-      {"title":"생화학2","day":2,"start":"15:30","end":"17:00","room":"자연1관320"}
+      {"title":"생화학2","day":2,"start":"15:30","end":"17:00","room":"자연1관320"},
+      {"title":"생체분자의이해","day":4,"start":"10:30","end":"12:30","room":"의학관2"}
     ]}
   ]
 };
